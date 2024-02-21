@@ -46,14 +46,16 @@ class InngestClone {
 
     await Promise.all(
       Object.keys(endpoints).map(async (ep) => {
-        // For each endpoint, split it into its directory and file by splitting on the last slash
+        // For each endpoint, split it into its directory and file by splitting
+        // on the last slash
         let [epDir, epFile] = ep.split(/\/(?![^\/]*\/)/);
         // Edge case if the endpoint is just a file with no directory
         if (epFile === undefined) {
           [epDir, epFile] = ["", epDir];
         }
 
-        // Push a router into src/index for the newly created route
+        // Begin writing the router for /src/index.js by creating an app.use
+        // call for the newly created route
         routerJS.push(
           `app.use("/api/${ep}", require("./routes/api/${ep}.js"));`
         );
@@ -100,7 +102,7 @@ class InngestClone {
       })
     );
 
-    // Replace the placeholder comment in src/index.js with the router
+    // Replace the placeholder comment in /src/index.js with the router
     // info for all the new route files
     fs.readFile(`${path}/index.js`, "utf8", function (err, data) {
       if (err) {
