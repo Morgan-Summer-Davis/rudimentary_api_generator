@@ -11,6 +11,10 @@ class InngestClone {
   async createFunction(eventId, callback) {
     this.functions[eventId] = callback;
 
+    await fs.promises.mkdir(`${path}/functions`, {
+      recursive: true,
+    });
+
     const funcJS = dedent(`
       const ${eventId} = ${callback};
 
@@ -28,8 +32,12 @@ class InngestClone {
 
   async createAPI(endpoints) {
     // Remove any existing index.js
-    await fs.promises.unlink(`${path}/index.js`, function (err) {
-      if (err) throw err;
+    fs.readFile(`${path}/index.js`, async (err, data) => {
+      if (!err && data) {
+        await fs.promises.unlink(`${path}/index.js`, function (err) {
+          if (err) throw err;
+        });
+      }
     });
 
     // Copy the index template to /src
